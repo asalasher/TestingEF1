@@ -8,12 +8,17 @@ namespace DataAccess
     public class UserRepository
     {
 
+        private readonly TestingEF1Entities _dbConnection;
+
+        public UserRepository(TestingEF1Entities dbConnection)
+        {
+            _dbConnection = dbConnection;
+        }
+
         public List<User> GetUsersList()
         {
-            TestingEF1Entities dbConnection = new TestingEF1Entities();
-
             // Esto me trae todas las data entities
-            List<Users> usersFromDb = dbConnection.Users.ToList();
+            List<Users> usersFromDb = _dbConnection.Users.ToList();
 
             // Ahora toca relizar la transformacion de data entity a domain entity
             // Mapper
