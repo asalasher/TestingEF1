@@ -1,6 +1,8 @@
 ﻿using DataAccess.DbModel;
 using Domain;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Linq;
 
 namespace DataAccess
@@ -10,20 +12,19 @@ namespace DataAccess
 
         // _carsRepository to be replacedd by the database
         //private readonly List<Car> _carsRepository = new List<Car>();
+        private readonly TestingEF1Entities _dbConnection;
 
-        public CarRepository()
+
+        public CarRepository(TestingEF1Entities dbConnection)
         {
-            // ???
-            var _carsRepository = new Cars();
+            _dbConnection = dbConnection;
         }
 
         // El que no acaba en S es la entity de capa dominio
         public List<Car> GetCarsList()
         {
-            TestingEF1Entities dbConnection = new TestingEF1Entities();
-
             // Esto me trae todas las data entities
-            List<Cars> carsFromDb = dbConnection.Cars.ToList();
+            List<Cars> carsFromDb = _dbConnection.Cars.ToList();
 
             // Ahora toca relizar la transformacion de data entity a domain entity
             // Mapper
@@ -42,34 +43,87 @@ namespace DataAccess
 
         public Car GetById(int id)
         {
-            return _carsRepository.FirstOrDefault(x => x.Id == id);
-        }
-
-        public bool Insert(Car entity)
-        {
-            _carsRepository.Add(entity);
-            return true;
-        }
-
-        public bool Update(Car entity)
-        {
-            int carIndex = _carsRepository.IndexOf(entity);
-            if (carIndex > -1)
+            // TODO - select by id
+            if (_dbConnection.Cars.Find(id) is Cars car)
             {
-                _carsRepository[carIndex] = entity;
+                Car entityCar = new Car
+                {
+                    Id = car.Id,
+                    Model = car.Model,
+                    IdOwner = car.IdOwner
+                };
+                return entityCar;
+
+            }
+            return null;
+        }
+
+        public bool Insert(Car domainEntity)
+        {
+            Cars newDataEntity = new Cars
+            {
+                Id = domainEntity.Id,
+                Model = domainEntity.Model,
+                IdOwner = domainEntity.IdOwner,
+            };
+
+            try
+            {
+                Cars car = _dbConnection.Cars.Add(newDataEntity);
+                _dbConnection.SaveChanges();
+
+                if (car is null)
+                {
+                    return false;
+                }
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+
+        }
+
+        public bool UpsertCar(Car domainEntity)
+        {
+            // Creation of data entity
+            Cars newDataEntity = new Cars
+            {
+                Id = domainEntity.Id,
+                Model = domainEntity.Model,
+                IdOwner = domainEntity.IdOwner,
+            };
+
+            try
+            {
+                _dbConnection.Cars.AddOrUpdate(newDataEntity);
+                _dbConnection.SaveChanges();
                 return true;
             }
-            return false;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+
         }
 
         public bool Delete(int id)
         {
-            Car car = GetById(id);
-            if (car != null)
+            // Todo - check this
+            Cars car = _dbConnection.Cars.Find(id);
+            if (car is null)
             {
-                return _carsRepository.Remove(car);
+                return false;
             }
-            return false;
+
+            _dbConnection.Cars.Remove(car);
+            _dbConnection.SaveChanges();
+
+            return true;
         }
 
     }
