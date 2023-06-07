@@ -32,6 +32,7 @@ namespace TestingEF1
                 Console.WriteLine(user.ToString());
             }
 
+            Console.WriteLine("Press a key to get the cars");
             Console.ReadLine();
 
             Console.WriteLine("Cars:");
@@ -43,6 +44,7 @@ namespace TestingEF1
                 Console.WriteLine(car.ToString());
             }
 
+            Console.WriteLine("Press a key");
             Console.ReadLine();
 
             Console.WriteLine("Modify a Car:");
@@ -65,6 +67,15 @@ namespace TestingEF1
             {
                 Console.WriteLine("Succesfully updated");
             }
+
+            Console.WriteLine("Get cars from user. Introduce user's id");
+            int idUser = int.Parse(Console.ReadLine());
+            List<Car> userCars = carsRepo.GetCarsFromUser(idUser);
+            if (userCars.Count > 0)
+            {
+                userCars.ForEach(car => Console.WriteLine(car.ToString()));
+            }
+            else { Console.WriteLine("The user has no cars"); }
 
             Console.ReadLine();
         }

@@ -24,6 +24,9 @@ namespace DataAccess
         public List<Car> GetCarsList()
         {
             // Esto me trae todas las data entities
+            //using (_dbConnection)
+            //{
+            //}
             List<Cars> carsFromDb = _dbConnection.Cars.ToList();
 
             // Ahora toca relizar la transformacion de data entity a domain entity
@@ -124,6 +127,33 @@ namespace DataAccess
             _dbConnection.SaveChanges();
 
             return true;
+        }
+
+        public List<Car> GetCarsFromUser(int userId)
+        {
+            List<Users> users = _dbConnection.Users.ToList();
+
+            List<Cars> cars = _dbConnection.Cars.ToList();
+
+            var query = from user in users
+                        join car in cars on user.Id equals car.IdOwner
+                        where user.Id == userId
+                        select car;
+
+            List<Car> domainEntityCars = new List<Car>();
+
+            foreach (var car in query)
+            {
+                Car entityCar = new Car
+                {
+                    Id = car.Id,
+                    Model = car.Model,
+                    IdOwner = car.IdOwner
+                };
+                domainEntityCars.Add(entityCar);
+            }
+
+            return domainEntityCars;
         }
 
     }
