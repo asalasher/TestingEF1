@@ -7,17 +7,17 @@ using System.Linq;
 
 namespace DataAccess
 {
-    public class CarRepository
+    public class CarRepository : ICarRepository
     {
 
         // _carsRepository to be replacedd by the database
         //private readonly List<Car> _carsRepository = new List<Car>();
         private readonly TestingEF1Entities _dbConnection;
 
-
-        public CarRepository(TestingEF1Entities dbConnection)
+        public CarRepository()
         {
-            _dbConnection = dbConnection;
+            //_dbConnection = dbConnection;
+            _dbConnection = new TestingEF1Entities();
         }
 
         // El que no acaba en S es la entity de capa dominio
@@ -129,32 +129,14 @@ namespace DataAccess
             return true;
         }
 
-        public List<Car> GetCarsFromUser(int userId)
-        {
-            List<Users> users = _dbConnection.Users.ToList();
+        //List<Users> users = _dbConnection.Users.ToList();
+        //List<Cars> cars = _dbConnection.Cars.ToList();
 
-            List<Cars> cars = _dbConnection.Cars.ToList();
+        //var query = from user in users
+        //            join car in cars on user.Id equals car.IdOwner
+        //            where user.Id == userId
+        //            select car;
 
-            var query = from user in users
-                        join car in cars on user.Id equals car.IdOwner
-                        where user.Id == userId
-                        select car;
-
-            List<Car> domainEntityCars = new List<Car>();
-
-            foreach (var car in query)
-            {
-                Car entityCar = new Car
-                {
-                    Id = car.Id,
-                    Model = car.Model,
-                    IdOwner = car.IdOwner
-                };
-                domainEntityCars.Add(entityCar);
-            }
-
-            return domainEntityCars;
-        }
 
     }
 }

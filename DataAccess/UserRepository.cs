@@ -5,14 +5,15 @@ using System.Linq;
 
 namespace DataAccess
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
 
         private readonly TestingEF1Entities _dbConnection;
 
-        public UserRepository(TestingEF1Entities dbConnection)
+        public UserRepository()
         {
-            _dbConnection = dbConnection;
+            //_dbConnection = dbConnection;
+            _dbConnection = new TestingEF1Entities();
         }
 
         public List<User> GetUsersList()
@@ -35,6 +36,39 @@ namespace DataAccess
             }
             return usersAsDomainEntities;
         }
+
+        public List<Car> GetUserCars(int userId)
+        {
+            List<Cars> userCars = _dbConnection.Users.Find(userId).Cars.ToList();
+
+            List<Car> domainEntityCars = new List<Car>();
+
+            // TODO -> check this
+            userCars.ForEach(x =>
+            {
+                domainEntityCars.Add(new Car
+                {
+                    Id = x.Id,
+                    Model = x.Model,
+                    IdOwner = x.IdOwner,
+                });
+            });
+
+            foreach (var car in userCars)
+            {
+                Car entityCar = new Car
+                {
+                    Id = car.Id,
+                    Model = car.Model,
+                    IdOwner = car.IdOwner
+                };
+                domainEntityCars.Add(entityCar);
+            }
+
+            return domainEntityCars;
+        }
+
+
 
     }
 }
