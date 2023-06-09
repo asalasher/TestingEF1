@@ -41,6 +41,7 @@ namespace TestingEF1
 
             Console.WriteLine("Press any key to continuer");
             Console.ReadKey();
+
         }
 
         static void RegisterTypes(IUnityContainer container)
