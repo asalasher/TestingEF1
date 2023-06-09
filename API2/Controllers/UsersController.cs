@@ -1,8 +1,10 @@
-﻿using Services;
+﻿using Newtonsoft.Json;
+using Services;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Results;
 
 namespace API2.Controllers
 {
@@ -31,10 +33,18 @@ namespace API2.Controllers
 
         [HttpGet]
         [Route("GetAll")] // atencion!!! hace overwrite del api/users
-        public JsonResult<List<string>> Get()
+        //public JsonResult<List<string>> Get()
+        public HttpResponseMessage Get()
         {
+
             List<string> users = _userService.GetListUsers();
-            return Json(users);
+            var superString = JsonConvert.SerializeObject(users);
+
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, "data");
+            response.Content = new StringContent(superString);
+            return response;
+
+            //return Json(users);
             //return $"hola from getall with id {id}";
         }
 
