@@ -102,6 +102,7 @@
   <ItemGroup>
     <Compile Include="App_Start\UnityResolver.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\JsonResult.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -129,6 +130,10 @@
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{3ac9eeba-1c3e-424d-9dae-a9d7efcb844f}</Project>
       <Name>Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DTOs\DTOs.csproj">
+      <Project>{a9a3f11b-442c-4410-8a37-6a65e3214add}</Project>
+      <Name>DTOs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Services\Services.csproj">
       <Project>{72417046-6afc-4e96-bd1c-9765d453768d}</Project>

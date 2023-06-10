@@ -1,13 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using Domain;
+using DTOs;
+using Newtonsoft.Json;
 using Services;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Description;
+using System.Web.Http.Results;
 
 namespace API2.Controllers
 {
+    [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
         private readonly IUserService _userService;
@@ -26,10 +31,10 @@ namespace API2.Controllers
         //}
 
         // GET: api/Users/5
-        //public string Get(int id)
-        //{
-        //    return "Hello";
-        //}
+        public string Get(int id)
+        {
+            return "Hello";
+        }
 
         [HttpGet]
         [Route("GetAll")] // atencion!!! hace overwrite del api/users
@@ -40,7 +45,7 @@ namespace API2.Controllers
             List<string> users = _userService.GetListUsers();
             var superString = JsonConvert.SerializeObject(users);
 
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, "data");
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(superString);
             return response;
 
@@ -48,21 +53,65 @@ namespace API2.Controllers
             //return $"hola from getall with id {id}";
         }
 
-        //[HttpGet]
-        //[Route("getall")]
-        //public JsonResult<List<string>> GetAllUsers(int id)
-        //{
-        //    var users = _userService.GetListUsers();
-        //    return Json(users);
-        //}
+        [HttpGet]
+        [Route("getId/{id:int}")]
+        public JsonResult<int> GetIdFromUrl(int id)
+        {
+            return Json(id);
+        }
+
+        [HttpGet]
+        [Route("getobject")]
+        [ResponseType(typeof(User))]
+        public IHttpActionResult GetIdFromUrl()
+        {
+            User user = new User { Id = 2, Name = "Alberto", DateOfBirth = DateTime.Now };
+            return Ok(user);
+            //return NotFound();
+        }
+
+        [HttpGet]
+        [Route("getusersbylist")]
+        [ResponseType(typeof(List<User>))]
+        public IHttpActionResult GetUsersByList()
+        {
+            List<User> users = new List<User>() {
+                new User { Id = 2, Name = "Alberto", DateOfBirth = DateTime.Now },
+                new User { Id = 3, Name = "Pedro", DateOfBirth = DateTime.Now },
+                new User { Id = 4, Name = "Manolo", DateOfBirth = DateTime.Now }
+            };
+
+            return Ok(users);
+            //return NotFound();
+            //return Content(HttpStatusCode.NotFound, "student not found");
+        }
+
+        [HttpGet]
+        [Route("getobject")]
+        [ResponseType(typeof(string))]
+        public IHttpActionResult GetQueryString()
+        {
+            // No consigo hacer funcionar esto
+            var queryValues = Request.GetQueryNameValuePairs();
+            if (queryValues is null)
+                return Ok("null query");
+
+            return Ok("return");
+        }
 
         // POST: api/Users
         [HttpPost]
         [Route("pruebapost")]
-        public void Post([FromBody] string value)
+        [ResponseType(typeof(UserDTO))]
+        public IHttpActionResult Post([FromBody] UserDTO value)
         {
-            // hay que deserialize el cuerpo o como va esto?
-            Console.WriteLine(value);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("format incorrect");
+                //return Content(HttpStatusCode.BadGateway, "NO");
+            }
+
+            return Ok(value);
         }
 
         // PUT: api/Users/5
